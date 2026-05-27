@@ -852,6 +852,67 @@
         body.force-print-layout .remarks-section tr { display: table-row !important; }
         body.force-print-layout .remarks-section td { display: table-cell !important; width: auto !important; padding: 5px !important; }
 
+
+        /* =========================
+           html2canvas PDF 글자 잘림 방지 FIX
+           - 모바일 Safari/Chrome에서 input 내부 글자 하단이 잘리는 현상 보정
+        ========================= */
+        body.force-print-layout,
+        body.force-print-layout * {
+            -webkit-font-smoothing: antialiased !important;
+            text-rendering: geometricPrecision !important;
+        }
+
+        body.force-print-layout input,
+        body.force-print-layout textarea,
+        body.force-print-layout .print-text,
+        body.force-print-layout td,
+        body.force-print-layout th,
+        body.force-print-layout div,
+        body.force-print-layout span {
+            line-height: 1.65 !important;
+            overflow: visible !important;
+        }
+
+        body.force-print-layout input,
+        body.force-print-layout textarea {
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            height: 24px !important;
+            min-height: 24px !important;
+            padding: 3px 2px 5px 2px !important;
+            display: block !important;
+        }
+
+        body.force-print-layout textarea {
+            height: auto !important;
+            min-height: 70px !important;
+            white-space: pre-wrap !important;
+        }
+
+        body.force-print-layout .main-table th,
+        body.force-print-layout .main-table td {
+            height: 48px !important;
+            padding: 5px 3px 6px 3px !important;
+            line-height: 1.55 !important;
+        }
+
+        body.force-print-layout .info-right th,
+        body.force-print-layout .info-right td {
+            padding: 5px 6px 7px 6px !important;
+            line-height: 1.55 !important;
+        }
+
+        body.force-print-layout .amount-box {
+            line-height: 1.65 !important;
+            padding: 16px 15px 18px 15px !important;
+        }
+
+        body.force-print-layout .remarks-section td {
+            padding: 6px 5px 8px 5px !important;
+            line-height: 1.65 !important;
+        }
+
     </style>
 
     <!-- PDF 생성 라이브러리: 모바일 브라우저 print 대신 캔버스 방식으로 PDF 생성 -->
@@ -1082,7 +1143,7 @@
             await new Promise(resolve => setTimeout(resolve, 300));
 
             const canvas = await html2canvas(page, {
-                scale: 2,
+                scale: 3,
                 useCORS: true,
                 allowTaint: true,
                 backgroundColor: '#ffffff',
@@ -1091,13 +1152,13 @@
                 scrollY: 0
             });
 
-            const imgData = canvas.toDataURL('image/jpeg', 0.98);
+            const imgData = canvas.toDataURL('image/png');
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
                 format: 'a4',
-                compress: true
+                compress: false
             });
 
             const pageWidth = 210;
@@ -1114,7 +1175,7 @@
                 x = (pageWidth - imgWidth) / 2;
             }
 
-            pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+            pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
             pdf.save(fileName);
         } catch (e) {
             console.error(e);
