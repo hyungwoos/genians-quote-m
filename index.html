@@ -913,6 +913,38 @@
             line-height: 1.65 !important;
         }
 
+
+        /* =========================
+           PDF 캡처 전용: input/select/textarea를 일반 텍스트로 치환
+           - 모바일 PDF에서 글씨 하단이 잘리는 현상 방지
+        ========================= */
+        .pdf-static-field {
+            display: block !important;
+            width: 100% !important;
+            min-height: 20px !important;
+            line-height: 1.75 !important;
+            padding: 2px 3px 4px 3px !important;
+            margin: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            color: #333 !important;
+            font: inherit !important;
+            box-sizing: border-box !important;
+            white-space: pre-wrap !important;
+            word-break: keep-all !important;
+            overflow: visible !important;
+        }
+
+        .pdf-static-field.text-right,
+        .text-right .pdf-static-field,
+        .input-num + .pdf-static-field {
+            text-align: right !important;
+        }
+
+        .pdf-static-field.pdf-center {
+            text-align: center !important;
+        }
+
     </style>
 
     <!-- PDF 생성 라이브러리: 모바일 브라우저 print 대신 캔버스 방식으로 PDF 생성 -->
@@ -1079,6 +1111,80 @@
 <script>
     window.lastAutoRemarks = "";
 
+    function normalizePdfCloneForCanvas(clonedDoc) {
+        const clonedPage = clonedDoc.querySelector('.page');
+        if (!clonedPage) return;
+
+        clonedDoc.body.classList.add('force-print-layout');
+
+        const makeStaticText = (el, text, align) => {
+            const div = clonedDoc.createElement('div');
+            div.className = 'pdf-static-field';
+            if (align === 'right') div.style.textAlign = 'right';
+            else if (align === 'center') div.style.textAlign = 'center';
+            else div.style.textAlign = getComputedStyle(el).textAlign || 'left';
+
+            div.textContent = text || '';
+
+            const cs = getComputedStyle(el);
+            div.style.fontSize = cs.fontSize;
+            div.style.fontWeight = cs.fontWeight;
+            div.style.letterSpacing = cs.letterSpacing;
+            div.style.color = cs.color;
+            div.style.minHeight = Math.max(el.offsetHeight || 20, 22) + 'px';
+            div.style.lineHeight = '1.75';
+            div.style.paddingBottom = '4px';
+            div.style.overflow = 'visible';
+
+            return div;
+        };
+
+        clonedPage.querySelectorAll('select').forEach(sel => {
+            const opt = sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
+            const text = opt ? opt.text : '';
+            const div = makeStaticText(sel, text, 'left');
+            sel.replaceWith(div);
+        });
+
+        clonedPage.querySelectorAll('input').forEach(input => {
+            let text = input.value || '';
+            if (input.type === 'date' && text) {
+                text = text.replace(/-/g, '.');
+            }
+
+            const parent = input.parentElement;
+            let align = 'left';
+            if (input.classList.contains('input-num') || input.classList.contains('text-right')) align = 'right';
+            if (parent && parent.tagName === 'TD' && parent.style.textAlign === 'center') align = 'center';
+
+            const div = makeStaticText(input, text, align);
+            if (input.id === 'customerName') {
+                div.style.fontSize = '20px';
+                div.style.fontWeight = '900';
+                div.style.borderBottom = '2px solid #000';
+            }
+            input.replaceWith(div);
+        });
+
+        clonedPage.querySelectorAll('textarea').forEach(textarea => {
+            const div = makeStaticText(textarea, textarea.value || '', 'left');
+            div.style.minHeight = Math.max(textarea.scrollHeight || 80, 80) + 'px';
+            textarea.replaceWith(div);
+        });
+
+        clonedPage.querySelectorAll('.print-text').forEach(el => {
+            el.style.display = 'block';
+            el.style.lineHeight = '1.75';
+            el.style.paddingBottom = '4px';
+            el.style.overflow = 'visible';
+        });
+
+        clonedPage.querySelectorAll('td, th, div, span').forEach(el => {
+            el.style.overflow = 'visible';
+            el.style.lineHeight = el.classList.contains('doc-title') ? '1.2' : '1.6';
+        });
+    }
+
     async function prepareAndPrint() {
         calcAll();
 
@@ -1149,7 +1255,10 @@
                 backgroundColor: '#ffffff',
                 windowWidth: 1200,
                 scrollX: 0,
-                scrollY: 0
+                scrollY: 0,
+                onclone: function(clonedDoc) {
+                    normalizePdfCloneForCanvas(clonedDoc);
+                }
             });
 
             const imgData = canvas.toDataURL('image/png');
