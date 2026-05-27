@@ -1139,11 +1139,10 @@
             return div;
         };
 
-        clonedPage.querySelectorAll('select').forEach(sel => {
-            const opt = sel.options && sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null;
-            const text = opt ? opt.text : '';
-            const div = makeStaticText(sel, text, 'left');
-            sel.replaceWith(div);
+        // 중요: 서비스/계약기간/납부주기/담당자 선택값은 이미 .print-text 또는 .only-print 영역에 들어가 있습니다.
+        // 따라서 select(.no-print)를 다시 텍스트로 변환하면 PDF에서 같은 값이 두 번 출력됩니다.
+        clonedPage.querySelectorAll('.no-print, select').forEach(el => {
+            el.remove();
         });
 
         clonedPage.querySelectorAll('input').forEach(input => {
@@ -1172,9 +1171,13 @@
             textarea.replaceWith(div);
         });
 
-        // select/input 값을 별도 텍스트로 변환했으므로 기존 출력용 print-text는 중복 표시 방지를 위해 제거
+        // .print-text는 행 선택값 출력용이므로 유지합니다.
         clonedPage.querySelectorAll('.print-text').forEach(el => {
-            el.remove();
+            el.style.display = 'block';
+            el.style.visibility = 'visible';
+            el.style.lineHeight = '1.6';
+            el.style.minHeight = '18px';
+            el.style.overflow = 'visible';
         });
 
         clonedPage.querySelectorAll('td, th, div, span').forEach(el => {
