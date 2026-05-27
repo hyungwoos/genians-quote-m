@@ -3,737 +3,860 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Genians 공식 자동 견적 시스템 v2.6 Mobile</title>
+    <title>Genians 공식 자동 견적 시스템 v2.6</title>
     <style>
-
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
 
         :root { --genians-green: #1fb53a; --border-color: #000; --gray-bg: #f8f9fa; }
         * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: #525659; margin: 0; padding: 20px; color: #333; }
 
-        html, body {
-            width: 100%;
-            min-height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'Noto Sans KR', sans-serif;
-            background: #f2f4f6;
-            color: #222;
-        }
-
-        body {
-            padding: 0;
-        }
-
-        .toolbar {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            width: 100%;
-            margin: 0;
-            padding: 10px;
-            background: #fff;
-            border-radius: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-        }
-
-        .toolbar > div:first-child {
-            font-size: 13px;
-            text-align: center;
-            font-weight: bold;
-            color: var(--genians-green);
-        }
-
-        .toolbar > div:last-child {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px 8px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            border: none;
-            color: white;
-        }
-
+        .toolbar { width: 210mm; margin: 0 auto 15px; background: #fff; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn { padding: 10px 20px; font-weight: bold; border-radius: 5px; cursor: pointer; border: none; color: white; }
         .btn-print { background: var(--genians-green); }
         .btn-add { background: #343a40; }
 
-        .page {
-            width: 100%;
-            min-height: auto;
-            margin: 0;
-            padding: 14px;
-            background: #fff;
-            box-shadow: none;
-            position: relative;
-        }
+        .page { width: 210mm; min-height: 297mm; background: white; margin: 0 auto; padding: 15mm; position: relative; }
+        input, select, textarea { width: 100%; border: none; outline: none; font-family: inherit; font-size: inherit; background: transparent; padding: 2px; }
+        select { border: 1px solid #ccc; background: #fff; border-radius: 3px; padding: 4px; font-size: 11px; }
+        
+        .logo-box { position: absolute; top: 15mm; left: 15mm; }
+        .logo-box img { height: 35px; object-fit: contain; }
 
-        input, select, textarea {
-            width: 100%;
-            min-height: 42px;
-            border: 1px solid #d8dde3;
-            border-radius: 9px;
-            outline: none;
-            font-family: inherit;
-            font-size: 15px;
-            background: #fff;
-            padding: 9px 10px;
-        }
+        .doc-title { font-size: 36px; font-weight: 900; text-align: center; letter-spacing: 15px; text-decoration: underline; text-underline-offset: 10px; margin-bottom: 30px; }
+        
+        .info-section { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 12px; }
+        .info-left { width: 45%; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; padding-bottom: 5px; }
+        .info-left .input-line { border-bottom: 1px solid #aaa; border-radius: 0; padding-left: 5px; }
+        
+        .info-right { width: 50%; }
+        .info-right table { width: 100%; border-collapse: collapse; border: 2px solid var(--border-color); font-size: 11px; }
+        .info-right th, .info-right td { border: 1px solid var(--border-color); padding: 4px; text-align: center; }
+        .info-right th { background: #f0f0f0; font-weight: bold; }
+        .info-right .provider-title { writing-mode: vertical-rl; text-orientation: upright; width: 30px; letter-spacing: 5px; font-size: 13px; }
+        
+        .table-responsive { width: 100%; }
+        .main-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border-color); font-size: 11px; table-layout: fixed; }
+        .main-table th { background: var(--genians-green); color: white; height: 35px; border: 1px solid var(--genians-green); }
+        .main-table td { border: 1px solid #ccc; height: 40px; padding: 2px; text-align: center; vertical-align: middle; }
+        .text-right { text-align: right !important; }
+        .input-num { text-align: right; }
 
-        input[readonly] {
-            background: #f7f8fa;
-            color: #333;
-        }
+        .custom-input { width: 100%; border: 1px solid #ccc; background: #fff; border-radius: 3px; padding: 4px; font-size: 11px; box-sizing: border-box; }
 
-        select {
-            background: #fff;
-            font-size: 15px;
-        }
-
-        textarea {
-            line-height: 1.5;
-            resize: none;
-            overflow: hidden;
-        }
-
-        .logo-box {
-            position: relative;
-            top: 0;
-            left: 0;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-
-        .logo-box img {
-            height: 30px;
-            object-fit: contain;
-        }
-
-        .doc-title {
-            margin-top: 0;
-            margin-bottom: 18px;
-            font-size: 26px;
-            font-weight: 900;
-            text-align: center;
-            letter-spacing: 8px;
-            text-decoration: underline;
-            text-underline-offset: 7px;
-        }
-
-        .info-section {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-bottom: 16px;
-            font-size: 12px;
-        }
-
-        .info-left,
-        .info-right {
-            width: 100%;
-        }
-
-        .info-left {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            padding-bottom: 0;
-        }
-
-        .info-left > div {
-            display: block !important;
-        }
-
-        .info-left span {
-            display: block;
-            width: auto !important;
-            margin-bottom: 5px;
-            font-size: 12px;
-            color: #555;
-            font-weight: bold;
-        }
-
-        #customerName {
-            height: 44px;
-            font-size: 20px !important;
-            font-weight: 900 !important;
-            border-bottom: 2px solid #000 !important;
-            text-align: left !important;
-            padding: 0 5px !important;
-            border-radius: 0 !important;
-        }
-
-        .info-left .input-line {
-            border: 1px solid #d8dde3;
-            border-radius: 9px;
-            padding-left: 10px;
-        }
-
-        .info-right table,
-        .info-right tbody,
-        .info-right tr,
-        .info-right th,
-        .info-right td {
-            display: block;
-            width: 100% !important;
-        }
-
-        .info-right table {
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            overflow: hidden;
-            font-size: 12px;
-            background: #fff;
-            border-collapse: collapse;
-        }
-
-        .info-right tr {
-            border-bottom: 1px solid #eee;
-        }
-
-        .info-right tr:last-child {
-            border-bottom: none;
-        }
-
-        .info-right th,
-        .info-right td {
-            border: none;
-            text-align: left;
-            padding: 8px 10px;
-        }
-
-        .info-right th {
-            background: #f7f7f7;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .info-right .provider-title {
-            writing-mode: horizontal-tb;
-            text-orientation: mixed;
-            letter-spacing: 0;
-            text-align: center;
-            font-weight: 900;
-            background: var(--genians-green);
-            color: #fff;
-        }
-
-        .info-right td[colspan="3"] {
-            line-height: 1.4;
-        }
-
-        .info-right img[alt="직인"] {
-            width: 38px !important;
-            right: 10px !important;
-        }
-
-        #managerSelect {
-            width: 100% !important;
-        }
-
-        #quoteMessage {
-            font-size: 14px !important;
-            line-height: 1.4;
-            margin: 12px 0;
-            text-align: left;
-            font-weight: bold;
-            min-height: 22px;
-        }
-
-        .table-responsive {
-            overflow: visible;
-            width: 100%;
-        }
-
-        .main-table,
-        .main-table thead,
-        .main-table tbody,
-        .main-table tr,
-        .main-table th,
-        .main-table td {
-            display: block;
-            width: 100%;
-        }
-
-        .main-table {
-            border: none;
-            table-layout: auto;
-            font-size: 14px;
-            border-collapse: collapse;
-        }
-
-        .main-table thead {
-            display: none;
-        }
-
-        .main-table tr {
-            position: relative;
-            background: #fff;
-            border: 1px solid #ddd;
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-
-        .main-table td {
-            height: auto;
-            min-height: auto;
-            border: none;
-            padding: 7px 0;
-            text-align: left !important;
-            vertical-align: top;
-        }
-
-        .main-table td::before {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 12px;
-            font-weight: 800;
-            color: #555;
-        }
-
-        .main-table td:nth-child(1)::before { content: "서비스"; }
-        .main-table td:nth-child(2)::before { content: "계약 기간"; }
-        .main-table td:nth-child(3)::before { content: "납부 주기"; }
-        .main-table td:nth-child(4)::before { content: "소비자 단가"; }
-        .main-table td:nth-child(5)::before { content: "수량"; }
-        .main-table td:nth-child(6)::before { content: "제안 단가"; }
-        .main-table td:nth-child(7)::before { content: "공급 제안가"; }
-        .main-table td:nth-child(8)::before { content: "세액"; }
-        .main-table td:nth-child(9)::before { content: "비고"; }
-
-        .custom-input {
-            width: 100%;
-            min-height: 42px;
-            border: 1px solid #d8dde3;
-            background: #fff;
-            border-radius: 9px;
-            padding: 9px 10px;
-            font-size: 15px;
-            box-sizing: border-box;
-        }
-
-        .text-right,
-        .input-num {
-            text-align: right !important;
-        }
-
-        .qty {
-            width: 100% !important;
-        }
-
-        .btn-del {
-            position: static !important;
-            width: 100% !important;
-            height: 36px !important;
-            border-radius: 8px !important;
-            margin-top: 6px;
-            font-size: 13px !important;
-            background: #dc3545 !important;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-del::after {
-            content: " 항목 삭제";
-        }
-
-        .amount-box {
-            position: sticky;
-            bottom: 0;
-            z-index: 80;
-            display: flex;
-            flex-direction: column;
-            text-align: center;
-            gap: 8px;
-            margin: 14px -14px 0;
-            padding: 14px;
-            font-size: 15px;
-            font-weight: bold;
-            background: #fff;
-            border: 2px solid var(--border-color);
-            border-left: none;
-            border-right: none;
-            border-bottom: none;
-            border-radius: 14px 14px 0 0;
-            box-shadow: 0 -4px 14px rgba(0,0,0,0.14);
-        }
-
-        .amount-box div:last-child {
-            color: var(--genians-green);
-            font-size: 17px;
-            line-height: 1.5;
-            word-break: keep-all;
-        }
-
-        .remarks-section {
-            margin-top: 18px;
-            font-size: 12px;
-            padding-bottom: 20px;
-        }
-
-        .remarks-section table,
-        .remarks-section tbody,
-        .remarks-section tr,
-        .remarks-section td {
-            display: block;
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .remarks-section td {
-            padding: 3px 0;
-            vertical-align: middle;
-        }
-
-        .remarks-section input[type="text"] {
-            margin-bottom: 6px;
-            font-size: 15px;
-            width: 100%;
-            text-align: left;
-        }
-
-        .remarks-section textarea {
-            min-height: 150px;
-            font-size: 15px;
-            line-height: 1.5;
-        }
+        .amount-box { margin-top: 15px; border: 2px solid var(--border-color); padding: 15px; font-size: 16px; font-weight: bold; display: flex; justify-content: space-between; background: #fdfdfd; }
+        
+        .remarks-section { margin-top: 25px; font-size: 12px; }
+        .remarks-section table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        .remarks-section td { padding: 5px; vertical-align: middle; }
+        .remarks-section input { font-size: 11px; width: 100%; text-align: left; } 
+        .remarks-section textarea { width: 100%; min-height: 120px; resize: none; border: 1px solid #eee; padding: 5px; font-size: 11px; font-family: inherit; line-height: 1.5; overflow: hidden; }
 
         .only-print { display: none; }
         .print-text { display: none; }
 
         @media print {
-            @page { size: A4 portrait; margin: 8mm; }
-
-            html, body {
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: #fff !important;
-                overflow: visible !important;
+            @page { size: A4 portrait; margin: 0; }
+            html, body { 
+                width: 210mm !important; 
+                height: 297mm !important; 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                background: #fff !important; 
+                overflow: hidden !important; 
             }
-
-            .toolbar,
-            .btn-del,
-            .no-print {
-                display: none !important;
-            }
-
-            .only-print,
-            .print-text {
-                display: block !important;
-            }
-
-            .page {
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                background: #fff !important;
-            }
-
-            .logo-box {
-                text-align: left !important;
-                margin-bottom: 8px !important;
-            }
-
-            .doc-title {
-                font-size: 24px !important;
-                margin-bottom: 14px !important;
-            }
-
-            input,
-            textarea {
-                border: none !important;
-                background: transparent !important;
-                border-radius: 0 !important;
-                min-height: 0 !important;
-                padding: 2px !important;
-                font-size: inherit !important;
-            }
-
-            input::placeholder,
-            textarea::placeholder {
-                color: transparent !important;
-            }
-
-            select {
-                display: none !important;
-            }
-
-            .info-right table {
-                border: 1px solid #000 !important;
-                border-radius: 0 !important;
-            }
-
-            .info-right tr {
-                border-bottom: 1px solid #ddd !important;
+            
+            .page { 
+                width: 210mm !important; 
+                height: 297mm !important; 
+                min-height: 297mm !important; 
+                margin: 0 auto !important; 
+                padding: 15mm !important; 
+                box-shadow: none !important; 
+                position: relative !important;
+                box-sizing: border-box !important;
+                page-break-after: avoid !important;
                 page-break-inside: avoid !important;
+                overflow: hidden !important;
             }
 
-            .main-table tr {
-                box-shadow: none !important;
-                border: 1px solid #000 !important;
-                page-break-inside: avoid !important;
-            }
-
-            .amount-box {
-                position: static !important;
-                box-shadow: none !important;
-                border: 2px solid #000 !important;
-                margin: 12px 0 0 !important;
-                border-radius: 0 !important;
-            }
-
-            .remarks-section textarea {
-                border: none !important;
-            }
+            .toolbar, .btn-del, .no-print { display: none !important; }
+            .only-print { display: block !important; }
+            .print-text { display: block !important; }
+            
+            .logo-box { position: absolute !important; top: 15mm !important; left: 15mm !important; text-align: left !important; display: block !important; margin: 0 !important; }
+            .doc-title { margin-top: 0 !important; margin-bottom: 30px !important; font-size: 36px !important; text-align: center !important; }
+            
+            .info-section { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; justify-content: space-between !important; gap: 0 !important; }
+            .info-left { width: 45% !important; flex: 0 0 45% !important; display: flex !important; flex-direction: column !important; justify-content: flex-end !important; }
+            .info-right { width: 50% !important; flex: 0 0 50% !important; }
+            
+            .table-responsive { overflow: visible !important; width: 100% !important; display: block !important; }
+            .main-table { display: table !important; width: 100% !important; table-layout: fixed !important; }
+            .main-table th, .main-table td { padding: 2px !important; white-space: nowrap !important; } 
+            
+            .amount-box { display: flex !important; flex-direction: row !important; text-align: left !important; justify-content: space-between !important; }
+            
+            .remarks-section table { display: table !important; width: 100% !important; table-layout: fixed !important; }
+            .remarks-section tbody { display: table-row-group !important; width: 100% !important; }
+            .remarks-section tr { display: table-row !important; width: 100% !important; }
+            .remarks-section td { display: table-cell !important; padding: 5px !important; width: auto !important; }
+            
+            input::placeholder, textarea::placeholder { color: transparent; }
+            .info-left .input-line, input, textarea { border: none !important; background: transparent !important; }
+            input[type="date"]::-webkit-calendar-picker-indicator { display: none; }
+            select { display: none !important; }
+            .remarks-section textarea { border: none !important; }
+            .provider-title { white-space: nowrap !important; }
         }
 
-
-        /* =========================================================
-           모바일 PDF 1페이지 출력 보정
-           - 모바일 화면은 카드형 유지
-           - PDF/인쇄 시 sticky, min-height, overflow로 인한 빈 페이지 증가 방지
-        ========================================================= */
-        @media print {
-            @page { size: A4 portrait; margin: 6mm; }
-
-            html,
-            body {
-                width: 100% !important;
-                height: auto !important;
-                min-height: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                background: #fff !important;
-                overflow: visible !important;
+        @media screen and (max-width: 768px) {
+            body { 
+                padding: 0; 
+                background: #f2f4f6; 
+                color: #222; 
             }
 
-            body * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
+            .toolbar { 
+                position: sticky; 
+                top: 0; 
+                z-index: 100; 
+                width: 100%; 
+                margin: 0; 
+                padding: 10px; 
+                border-radius: 0; 
+                display: flex; 
+                flex-direction: column; 
+                gap: 8px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.12); 
             }
 
-            .toolbar,
-            .btn-del,
-            .no-print {
-                display: none !important;
+            .toolbar > div:first-child {
+                font-size: 13px;
+                text-align: center;
             }
 
-            .only-print,
-            .print-text {
-                display: block !important;
+            .toolbar > div:last-child {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
 
-            .page {
-                width: 100% !important;
-                min-width: 0 !important;
-                height: auto !important;
-                min-height: 0 !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                background: #fff !important;
-                overflow: visible !important;
-                page-break-after: avoid !important;
-                page-break-before: avoid !important;
-                page-break-inside: avoid !important;
-                break-after: avoid !important;
-                break-before: avoid !important;
-                break-inside: avoid !important;
+            .btn { 
+                width: 100%; 
+                padding: 12px 8px; 
+                font-size: 14px; 
+                border-radius: 8px; 
             }
 
-            .logo-box {
-                position: static !important;
-                text-align: left !important;
-                margin: 0 0 5px 0 !important;
+            .page { 
+                width: 100%; 
+                min-height: auto; 
+                margin: 0; 
+                padding: 14px; 
+                box-sizing: border-box; 
+                box-shadow: none; 
+            }
+            
+            .logo-box { 
+                position: relative; 
+                top: 0; 
+                left: 0; 
+                text-align: center; 
+                margin-bottom: 12px; 
             }
 
-            .logo-box img {
-                height: 22px !important;
+            .logo-box img { 
+                height: 30px; 
             }
 
-            .doc-title {
-                font-size: 22px !important;
-                letter-spacing: 8px !important;
-                margin: 0 0 8px 0 !important;
-                text-underline-offset: 5px !important;
+            .doc-title { 
+                margin-top: 0; 
+                margin-bottom: 18px; 
+                font-size: 26px; 
+                letter-spacing: 8px; 
+                text-underline-offset: 7px; 
+            }
+            
+            .info-section { 
+                flex-direction: column; 
+                gap: 14px; 
+                margin-bottom: 16px; 
             }
 
-            .info-section {
-                gap: 6px !important;
-                margin-bottom: 8px !important;
-                font-size: 9px !important;
+            .info-left, .info-right { 
+                width: 100%; 
             }
 
             .info-left {
-                gap: 4px !important;
-                padding-bottom: 0 !important;
+                gap: 12px;
+                padding-bottom: 0;
+            }
+
+            .info-left > div {
+                display: block !important;
             }
 
             .info-left span {
-                font-size: 9px !important;
-                margin-bottom: 2px !important;
+                display: block;
+                width: auto !important;
+                margin-bottom: 5px;
+                font-size: 12px;
+                color: #555;
             }
 
             #customerName {
-                height: auto !important;
-                font-size: 14px !important;
-                min-height: 0 !important;
+                font-size: 20px !important;
+                height: 44px;
             }
 
-            #quoteMessage {
-                font-size: 10px !important;
-                line-height: 1.25 !important;
-                margin: 6px 0 !important;
-                min-height: 0 !important;
-            }
-
-            input,
-            textarea {
-                border: none !important;
-                background: transparent !important;
-                border-radius: 0 !important;
-                min-height: 0 !important;
-                height: auto !important;
-                padding: 1px !important;
-                font-size: inherit !important;
-                line-height: 1.25 !important;
-            }
-
-            input::placeholder,
-            textarea::placeholder {
-                color: transparent !important;
-            }
-
-            select {
-                display: none !important;
+            .info-right table,
+            .info-right tbody,
+            .info-right tr,
+            .info-right th,
+            .info-right td {
+                display: block;
+                width: 100% !important;
             }
 
             .info-right table {
-                border: 1px solid #000 !important;
-                border-radius: 0 !important;
-                overflow: visible !important;
-                font-size: 8px !important;
+                border: 1px solid #ddd;
+                border-radius: 12px;
+                overflow: hidden;
+                font-size: 12px;
+                background: #fff;
             }
 
             .info-right tr {
-                border-bottom: 1px solid #ddd !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
+                border-bottom: 1px solid #eee;
+            }
+
+            .info-right tr:last-child {
+                border-bottom: none;
             }
 
             .info-right th,
             .info-right td {
-                padding: 3px 4px !important;
-                font-size: 8px !important;
-                line-height: 1.25 !important;
+                border: none;
+                text-align: left;
+                padding: 8px 10px;
+            }
+
+            .info-right th {
+                background: #f7f7f7;
+                font-size: 12px;
             }
 
             .info-right .provider-title {
-                font-size: 9px !important;
-                padding: 4px !important;
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                letter-spacing: 0;
+                text-align: center;
+                font-weight: 900;
+                background: var(--genians-green);
+                color: #fff;
+            }
+
+            #managerSelect {
+                width: 100% !important;
+            }
+
+            #quoteMessage {
+                font-size: 14px !important;
+                line-height: 1.4;
+                margin: 12px 0;
+            }
+            
+            .table-responsive { 
+                overflow: visible; 
+                width: 100%; 
+            }
+
+            .main-table,
+            .main-table thead,
+            .main-table tbody,
+            .main-table tr,
+            .main-table th,
+            .main-table td {
+                display: block;
+                width: 100%;
             }
 
             .main-table {
-                font-size: 9px !important;
+                border: none;
+                table-layout: auto;
+                font-size: 14px;
+            }
+
+            .main-table thead {
+                display: none;
             }
 
             .main-table tr {
-                box-shadow: none !important;
-                border: 1px solid #000 !important;
-                border-radius: 8px !important;
-                padding: 6px !important;
-                margin-bottom: 6px !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
+                position: relative;
+                background: #fff;
+                border: 1px solid #ddd;
+                border-radius: 14px;
+                padding: 12px;
+                margin-bottom: 14px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             }
 
             .main-table td {
-                padding: 3px 0 !important;
-                font-size: 9px !important;
-                line-height: 1.25 !important;
+                height: auto;
+                min-height: auto;
+                border: none;
+                padding: 7px 0;
+                text-align: left !important;
+                vertical-align: top;
             }
 
             .main-table td::before {
-                font-size: 8px !important;
-                margin-bottom: 1px !important;
+                display: block;
+                margin-bottom: 5px;
+                font-size: 12px;
+                font-weight: 800;
+                color: #555;
             }
 
-            .amount-box {
+            .main-table td:nth-child(1)::before { content: "서비스"; }
+            .main-table td:nth-child(2)::before { content: "계약 기간"; }
+            .main-table td:nth-child(3)::before { content: "납부 주기"; }
+            .main-table td:nth-child(4)::before { content: "소비자 단가"; }
+            .main-table td:nth-child(5)::before { content: "수량"; }
+            .main-table td:nth-child(6)::before { content: "제안 단가"; }
+            .main-table td:nth-child(7)::before { content: "공급 제안가"; }
+            .main-table td:nth-child(8)::before { content: "세액"; }
+            .main-table td:nth-child(9)::before { content: "비고"; }
+
+            select,
+            input,
+            textarea,
+            .custom-input {
+                min-height: 42px;
+                font-size: 15px !important;
+                border: 1px solid #d8dde3 !important;
+                border-radius: 9px !important;
+                padding: 9px 10px !important;
+                background: #fff !important;
+            }
+
+            input[readonly] {
+                background: #f7f8fa !important;
+                color: #333;
+            }
+
+            .input-num,
+            .text-right {
+                text-align: right !important;
+            }
+
+            .qty {
+                width: 100% !important;
+            }
+
+            .btn-del {
                 position: static !important;
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 3px !important;
-                box-shadow: none !important;
-                border: 1px solid #000 !important;
-                margin: 6px 0 0 !important;
-                padding: 6px !important;
-                border-radius: 0 !important;
-                font-size: 10px !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
+                width: 100% !important;
+                height: 36px !important;
+                border-radius: 8px !important;
+                margin-top: 6px;
+                font-size: 13px !important;
+                background: #dc3545 !important;
+            }
+
+            .btn-del::after {
+                content: " 항목 삭제";
+            }
+            
+            .amount-box { 
+                position: sticky;
+                bottom: 0;
+                z-index: 80;
+                flex-direction: column; 
+                text-align: center; 
+                gap: 8px; 
+                margin: 14px -14px 0;
+                padding: 14px;
+                font-size: 15px; 
+                border-left: none;
+                border-right: none;
+                border-bottom: none;
+                border-radius: 14px 14px 0 0;
+                box-shadow: 0 -4px 14px rgba(0,0,0,0.14);
             }
 
             .amount-box div:last-child {
-                font-size: 11px !important;
-                line-height: 1.25 !important;
+                font-size: 17px;
+                line-height: 1.5;
+                word-break: keep-all;
+            }
+            
+            .remarks-section { 
+                margin-top: 18px; 
             }
 
-            .remarks-section {
-                margin-top: 8px !important;
-                font-size: 8px !important;
+            .remarks-section table, 
+            .remarks-section tbody, 
+            .remarks-section tr, 
+            .remarks-section td { 
+                display: block; 
+                width: 100%; 
             }
 
-            .remarks-section table,
-            .remarks-section tbody,
-            .remarks-section tr,
-            .remarks-section td {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
+            .remarks-section td { 
+                padding: 3px 0; 
             }
 
-            .remarks-section td {
-                padding: 1px 0 !important;
-            }
-
-            .remarks-section input[type="text"] {
-                margin-bottom: 1px !important;
-                font-size: 8px !important;
-                min-height: 0 !important;
+            .remarks-section input[type="text"] { 
+                margin-bottom: 6px; 
             }
 
             .remarks-section textarea {
-                min-height: 38px !important;
-                max-height: 95px !important;
-                border: none !important;
-                font-size: 8px !important;
-                line-height: 1.25 !important;
-                overflow: hidden !important;
-            }
-
-            table,
-            tr,
-            td,
-            th {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
+                min-height: 150px;
+                line-height: 1.5;
             }
         }
 
+
+        /* 모바일에서 PDF 발행 시 A4 견적서 레이아웃을 강제로 복원 */
+        body.force-print-layout {
+            background: #fff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        body.force-print-layout .toolbar,
+        body.force-print-layout .btn-del,
+        body.force-print-layout .no-print {
+            display: none !important;
+        }
+        body.force-print-layout .only-print,
+        body.force-print-layout .print-text {
+            display: block !important;
+        }
+        body.force-print-layout .page {
+            width: 210mm !important;
+            min-width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            margin: 0 auto !important;
+            padding: 15mm !important;
+            box-shadow: none !important;
+            position: relative !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+        }
+        body.force-print-layout .logo-box {
+            position: absolute !important;
+            top: 15mm !important;
+            left: 15mm !important;
+            text-align: left !important;
+            margin: 0 !important;
+        }
+        body.force-print-layout .logo-box img {
+            height: 35px !important;
+        }
+        body.force-print-layout .doc-title {
+            margin-top: 0 !important;
+            margin-bottom: 30px !important;
+            font-size: 36px !important;
+            letter-spacing: 15px !important;
+            text-align: center !important;
+        }
+        body.force-print-layout .info-section {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            justify-content: space-between !important;
+            gap: 0 !important;
+            margin-bottom: 20px !important;
+            font-size: 12px !important;
+        }
+        body.force-print-layout .info-left {
+            width: 45% !important;
+            flex: 0 0 45% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            gap: 10px !important;
+            padding-bottom: 5px !important;
+        }
+        body.force-print-layout .info-left > div {
+            display: flex !important;
+        }
+        body.force-print-layout .info-left span {
+            display: inline-block !important;
+            width: 60px !important;
+            margin-bottom: 0 !important;
+            font-size: 12px !important;
+            color: #333 !important;
+        }
+        body.force-print-layout .info-right {
+            width: 50% !important;
+            flex: 0 0 50% !important;
+        }
+        body.force-print-layout .info-right table {
+            display: table !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border: 2px solid #000 !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+            table-layout: fixed !important;
+            font-size: 11px !important;
+            background: #fff !important;
+        }
+        body.force-print-layout .info-right tbody { display: table-row-group !important; }
+        body.force-print-layout .info-right tr { display: table-row !important; border-bottom: none !important; }
+        body.force-print-layout .info-right th,
+        body.force-print-layout .info-right td {
+            display: table-cell !important;
+            width: auto !important;
+            border: 1px solid #000 !important;
+            padding: 4px !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            font-size: 11px !important;
+            height: auto !important;
+            min-height: 0 !important;
+        }
+        body.force-print-layout .info-right th {
+            background: #f0f0f0 !important;
+            font-weight: bold !important;
+        }
+        body.force-print-layout .info-right .provider-title {
+            writing-mode: vertical-rl !important;
+            text-orientation: upright !important;
+            width: 30px !important;
+            min-width: 30px !important;
+            max-width: 30px !important;
+            letter-spacing: 5px !important;
+            font-size: 13px !important;
+            white-space: nowrap !important;
+        }
+        body.force-print-layout .info-right img[alt="직인"] {
+            width: 40px !important;
+            right: -10px !important;
+        }
+        body.force-print-layout .table-responsive {
+            overflow: visible !important;
+            width: 100% !important;
+            display: block !important;
+        }
+        body.force-print-layout .main-table {
+            display: table !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            border-collapse: collapse !important;
+            table-layout: fixed !important;
+            font-size: 11px !important;
+            border: 1px solid #000 !important;
+        }
+        body.force-print-layout .main-table thead { display: table-header-group !important; }
+        body.force-print-layout .main-table tbody { display: table-row-group !important; }
+        body.force-print-layout .main-table tr {
+            display: table-row !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+        body.force-print-layout .main-table th,
+        body.force-print-layout .main-table td {
+            display: table-cell !important;
+            border: 1px solid #ccc !important;
+            height: 40px !important;
+            padding: 2px !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            white-space: nowrap !important;
+            font-size: 11px !important;
+        }
+        body.force-print-layout .main-table th {
+            background: var(--genians-green) !important;
+            color: #fff !important;
+            border-color: var(--genians-green) !important;
+        }
+        body.force-print-layout .main-table td::before { content: none !important; display: none !important; }
+        body.force-print-layout select { display: none !important; }
+        body.force-print-layout input,
+        body.force-print-layout textarea {
+            border: none !important;
+            background: transparent !important;
+            border-radius: 0 !important;
+            min-height: 0 !important;
+            height: auto !important;
+            padding: 2px !important;
+            font-size: inherit !important;
+        }
+        body.force-print-layout .amount-box {
+            position: static !important;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            text-align: left !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            margin-top: 15px !important;
+            padding: 15px !important;
+            font-size: 16px !important;
+        }
+        body.force-print-layout .remarks-section table { display: table !important; width: 100% !important; table-layout: fixed !important; }
+        body.force-print-layout .remarks-section tbody { display: table-row-group !important; }
+        body.force-print-layout .remarks-section tr { display: table-row !important; }
+        body.force-print-layout .remarks-section td { display: table-cell !important; width: auto !important; padding: 5px !important; }
+
+        @media print {
+            body.force-print-layout .page,
+            .page {
+                transform: none !important;
+            }
+        }
+
+
+
+        /* 모바일 PDF는 브라우저 인쇄가 아니라 캡처 방식으로 생성하므로, 캡처 시 PC/A4 레이아웃을 강제로 사용 */
+        body.force-print-layout {
+            width: 210mm !important;
+            min-width: 210mm !important;
+            max-width: 210mm !important;
+            background: #fff !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: visible !important;
+        }
+
+        body.force-print-layout .page {
+            width: 210mm !important;
+            min-width: 210mm !important;
+            max-width: 210mm !important;
+            min-height: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 15mm !important;
+            box-shadow: none !important;
+            background: #fff !important;
+            overflow: visible !important;
+            position: relative !important;
+            box-sizing: border-box !important;
+        }
+
+        body.force-print-layout .toolbar,
+        body.force-print-layout .btn-del,
+        body.force-print-layout .no-print {
+            display: none !important;
+        }
+
+        body.force-print-layout .only-print,
+        body.force-print-layout .print-text {
+            display: block !important;
+        }
+
+        body.force-print-layout .logo-box {
+            position: absolute !important;
+            top: 15mm !important;
+            left: 15mm !important;
+            text-align: left !important;
+            margin: 0 !important;
+        }
+
+        body.force-print-layout .logo-box img {
+            height: 35px !important;
+        }
+
+        body.force-print-layout .doc-title {
+            margin-top: 0 !important;
+            margin-bottom: 30px !important;
+            font-size: 36px !important;
+            letter-spacing: 15px !important;
+            text-align: center !important;
+        }
+
+        body.force-print-layout .info-section {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            justify-content: space-between !important;
+            gap: 0 !important;
+            margin-bottom: 20px !important;
+            font-size: 12px !important;
+        }
+
+        body.force-print-layout .info-left {
+            width: 45% !important;
+            flex: 0 0 45% !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            gap: 10px !important;
+            padding-bottom: 5px !important;
+        }
+
+        body.force-print-layout .info-left > div {
+            display: flex !important;
+        }
+
+        body.force-print-layout .info-left span {
+            display: inline-block !important;
+            width: 60px !important;
+            margin-bottom: 0 !important;
+            font-size: 12px !important;
+            color: #333 !important;
+        }
+
+        body.force-print-layout .info-right {
+            width: 50% !important;
+            flex: 0 0 50% !important;
+            overflow: visible !important;
+        }
+
+        body.force-print-layout .info-right table {
+            display: table !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border: 2px solid #000 !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+            table-layout: fixed !important;
+            font-size: 11px !important;
+            background: #fff !important;
+        }
+
+        body.force-print-layout .info-right tbody { display: table-row-group !important; }
+        body.force-print-layout .info-right tr { display: table-row !important; border-bottom: none !important; }
+
+        body.force-print-layout .info-right th,
+        body.force-print-layout .info-right td {
+            display: table-cell !important;
+            width: auto !important;
+            border: 1px solid #000 !important;
+            padding: 4px !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            font-size: 11px !important;
+            height: auto !important;
+            min-height: 0 !important;
+            white-space: normal !important;
+            word-break: keep-all !important;
+        }
+
+        body.force-print-layout .info-right th {
+            background: #f0f0f0 !important;
+            font-weight: bold !important;
+        }
+
+        body.force-print-layout .info-right .provider-title {
+            writing-mode: vertical-rl !important;
+            text-orientation: mixed !important;
+            width: 30px !important;
+            min-width: 30px !important;
+            max-width: 30px !important;
+            letter-spacing: 2px !important;
+            font-size: 12px !important;
+            white-space: nowrap !important;
+        }
+
+        body.force-print-layout .info-right td[colspan="3"] {
+            text-align: left !important;
+            padding-left: 10px !important;
+            line-height: 1.4 !important;
+        }
+
+        body.force-print-layout .info-right img[alt="직인"] {
+            width: 40px !important;
+            right: -8px !important;
+        }
+
+        body.force-print-layout .table-responsive {
+            overflow: visible !important;
+            width: 100% !important;
+            display: block !important;
+        }
+
+        body.force-print-layout .main-table {
+            display: table !important;
+            width: 100% !important;
+            min-width: 0 !important;
+            border-collapse: collapse !important;
+            table-layout: fixed !important;
+            font-size: 11px !important;
+            border: 1px solid #000 !important;
+        }
+
+        body.force-print-layout .main-table thead { display: table-header-group !important; }
+        body.force-print-layout .main-table tbody { display: table-row-group !important; }
+
+        body.force-print-layout .main-table tr {
+            display: table-row !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+        }
+
+        body.force-print-layout .main-table th,
+        body.force-print-layout .main-table td {
+            display: table-cell !important;
+            border: 1px solid #ccc !important;
+            height: 40px !important;
+            padding: 2px !important;
+            text-align: center !important;
+            vertical-align: middle !important;
+            white-space: nowrap !important;
+            font-size: 11px !important;
+        }
+
+        body.force-print-layout .main-table th {
+            background: var(--genians-green) !important;
+            color: #fff !important;
+            border-color: var(--genians-green) !important;
+        }
+
+        body.force-print-layout .main-table td::before { content: none !important; display: none !important; }
+
+        body.force-print-layout select { display: none !important; }
+
+        body.force-print-layout input,
+        body.force-print-layout textarea {
+            border: none !important;
+            background: transparent !important;
+            border-radius: 0 !important;
+            min-height: 0 !important;
+            height: auto !important;
+            padding: 2px !important;
+            font-size: inherit !important;
+        }
+
+        body.force-print-layout .amount-box {
+            position: static !important;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            text-align: left !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            margin: 15px 0 0 !important;
+            padding: 15px !important;
+            font-size: 16px !important;
+        }
+
+        body.force-print-layout .remarks-section {
+            margin-top: 25px !important;
+            font-size: 12px !important;
+        }
+
+        body.force-print-layout .remarks-section table { display: table !important; width: 100% !important; table-layout: fixed !important; }
+        body.force-print-layout .remarks-section tbody { display: table-row-group !important; }
+        body.force-print-layout .remarks-section tr { display: table-row !important; }
+        body.force-print-layout .remarks-section td { display: table-cell !important; width: auto !important; padding: 5px !important; }
+
     </style>
+
+    <!-- PDF 생성 라이브러리: 모바일 브라우저 print 대신 캔버스 방식으로 PDF 생성 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -760,10 +883,10 @@
     }
 </script>
 <div class="toolbar">
-    <div style="font-weight: bold; color: var(--genians-green);">Genians Pricing System v2.6 Mobile</div>
+    <div style="font-weight: bold; color: var(--genians-green);">Genians Pricing System v2.6</div>
     <div>
         <button class="btn btn-add" onclick="addRow()">+ 항목 추가</button>
-        <button class="btn btn-print" onclick="prepareAndPrint()">견적서 발행 (PDF)</button>
+        <button class="btn btn-print" onclick="prepareAndPrint()">견적서 PDF 저장</button>
     </div>
 </div>
 
@@ -895,14 +1018,14 @@
 <script>
     window.lastAutoRemarks = "";
 
-    function prepareAndPrint() {
+    async function prepareAndPrint() {
         calcAll();
 
         const customer = document.getElementById('customerName').value || "고객사명";
         const qDate = document.getElementById('quoteDate').value || "날짜미입력";
-
+        
         const firstRow = document.querySelector('#itemTable tbody tr');
-        let prodLabel = "견적서";
+        let prodLabel = "견적서비스";
         let qty = "0";
         let unit = "User";
 
@@ -925,20 +1048,84 @@
             }
         }
 
-        const fileName = `${qDate}_${customer}_${prodLabel}_${qty}${unit}_견적서(지니언스)_모바일`;
-        const originalTitle = document.title;
-        document.title = fileName;
+        const fileName = `${qDate}_${customer}_${prodLabel}_${qty}${unit}_견적서(지니언스).pdf`;
+        const page = document.querySelector('.page');
+        const btn = document.querySelector('.btn-print');
+        const originalBtnText = btn ? btn.innerText : "";
 
-        const clearTitle = function() {
-            document.title = originalTitle;
-        };
+        try {
+            if (!window.html2canvas || !window.jspdf) {
+                alert('PDF 생성 라이브러리를 불러오지 못했습니다. 네트워크 상태를 확인 후 다시 시도해주세요.');
+                return;
+            }
 
-        window.onafterprint = clearTitle;
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "PDF 생성 중...";
+            }
 
-        setTimeout(function() {
-            window.print();
-            setTimeout(clearTitle, 1200);
-        }, 150);
+            document.body.classList.add('force-print-layout');
+
+            // 모바일 브라우저에서 CSS 반영과 폰트/이미지 로딩을 기다림
+            if (document.fonts && document.fonts.ready) {
+                await document.fonts.ready;
+            }
+
+            await Promise.all(Array.from(document.images).map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(resolve => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                });
+            }));
+
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            const canvas = await html2canvas(page, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                windowWidth: 1200,
+                scrollX: 0,
+                scrollY: 0
+            });
+
+            const imgData = canvas.toDataURL('image/jpeg', 0.98);
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4',
+                compress: true
+            });
+
+            const pageWidth = 210;
+            const pageHeight = 297;
+            let imgWidth = pageWidth;
+            let imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let x = 0;
+            let y = 0;
+
+            // 내용이 A4 높이를 넘으면 1장에 맞게 자동 축소
+            if (imgHeight > pageHeight) {
+                imgHeight = pageHeight;
+                imgWidth = (canvas.width * imgHeight) / canvas.height;
+                x = (pageWidth - imgWidth) / 2;
+            }
+
+            pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+            pdf.save(fileName);
+        } catch (e) {
+            console.error(e);
+            alert('PDF 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+        } finally {
+            document.body.classList.remove('force-print-layout');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = originalBtnText;
+            }
+        }
     }
 
     function updateQuoteMessage() {
