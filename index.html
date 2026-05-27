@@ -945,6 +945,88 @@
             text-align: center !important;
         }
 
+
+        /* =========================
+           최종 레이아웃 보정
+           - 비고/결제조건 라벨 한 줄 표시
+           - 공급자 상호/주소 줄바꿈 최소화
+        ========================= */
+        .remarks-section table {
+            table-layout: fixed !important;
+        }
+        .remarks-section td:nth-child(1),
+        .remarks-section td:nth-child(3),
+        body.force-print-layout .remarks-section td:nth-child(1),
+        body.force-print-layout .remarks-section td:nth-child(3) {
+            width: 96px !important;
+            min-width: 96px !important;
+            max-width: 96px !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            overflow: visible !important;
+            vertical-align: top !important;
+        }
+        .remarks-section td:nth-child(1) input,
+        .remarks-section td:nth-child(3) input,
+        body.force-print-layout .remarks-section td:nth-child(1) input,
+        body.force-print-layout .remarks-section td:nth-child(3) input,
+        .remarks-section td:nth-child(1) .pdf-static-field,
+        .remarks-section td:nth-child(3) .pdf-static-field,
+        body.force-print-layout .remarks-section td:nth-child(1) .pdf-static-field,
+        body.force-print-layout .remarks-section td:nth-child(3) .pdf-static-field {
+            display: block !important;
+            width: 96px !important;
+            min-width: 96px !important;
+            max-width: 96px !important;
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            letter-spacing: 0 !important;
+            line-height: 1.6 !important;
+            font-weight: bold !important;
+            text-align: left !important;
+            overflow: visible !important;
+        }
+        body.force-print-layout .remarks-section td:nth-child(2),
+        body.force-print-layout .remarks-section td:nth-child(4) {
+            white-space: normal !important;
+            word-break: keep-all !important;
+        }
+        body.force-print-layout .info-right {
+            width: 55% !important;
+            flex: 0 0 55% !important;
+        }
+        body.force-print-layout .info-left {
+            width: 40% !important;
+            flex: 0 0 40% !important;
+        }
+        body.force-print-layout .info-right table {
+            table-layout: fixed !important;
+        }
+        body.force-print-layout .info-right th,
+        body.force-print-layout .info-right td {
+            word-break: keep-all !important;
+            overflow-wrap: normal !important;
+            line-height: 1.35 !important;
+            padding: 4px 5px !important;
+        }
+        body.force-print-layout .info-right td[style*="font-weight: bold"] {
+            white-space: nowrap !important;
+            font-size: 10.5px !important;
+        }
+        body.force-print-layout .info-right td[colspan="3"] {
+            white-space: normal !important;
+            word-break: keep-all !important;
+            line-height: 1.35 !important;
+            font-size: 10.5px !important;
+            padding-left: 8px !important;
+        }
+        body.force-print-layout .info-right .provider-title {
+            width: 34px !important;
+            min-width: 34px !important;
+            max-width: 34px !important;
+            letter-spacing: 2px !important;
+        }
+
     </style>
 
     <!-- PDF 생성 라이브러리: 모바일 브라우저 print 대신 캔버스 방식으로 PDF 생성 -->
@@ -1009,17 +1091,17 @@
             <table>
                 <tr>
                     <th rowspan="4" class="provider-title">공급자</th>
-                    <th style="width: 18%;">상호</th>
-                    <td style="width: 37%; font-weight: bold;">지니언스 주식회사</td>
-                    <th style="width: 15%;">대표</th>
-                    <td style="width: 25%; position: relative;">
+                    <th style="width: 14%;">상호</th>
+                    <td style="width: 42%; font-weight: bold; white-space: nowrap;">지니언스 주식회사</td>
+                    <th style="width: 13%;">대표</th>
+                    <td style="width: 26%; position: relative;">
                         <span style="position: relative; z-index: 2;">이동범</span>
                         <img src="도장.jpg" alt="직인" style="position: absolute; top: 50%; right: -10px; transform: translateY(-50%); width: 40px; mix-blend-mode: multiply; z-index: 1;">
                     </td>
                 </tr>
                 <tr>
                     <th>주소</th>
-                    <td colspan="3" style="text-align: left; padding-left: 10px; line-height: 1.4;">경기도 안양시 동안구 벌말로 66, 평촌역하이필드<br>A동 12층</td>
+                    <td colspan="3" style="text-align: left; padding-left: 10px; line-height: 1.4;">경기도 안양시 동안구 벌말로 66, 평촌역하이필드 A동 12층</td>
                 </tr>
                 <tr>
                     <th>홈페이지</th>
@@ -1073,32 +1155,32 @@
     <div class="remarks-section">
         <table>
             <colgroup>
-                <col style="width: 13%;">
-                <col style="width: 37%;">
-                <col style="width: 13%;">
-                <col style="width: 37%;">
+                <col style="width: 14%;">
+                <col style="width: 36%;">
+                <col style="width: 14%;">
+                <col style="width: 36%;">
             </colgroup>
             <tr>
-                <td><input type="text" value="결 제 조 건:" style="font-weight: bold; letter-spacing: 2px;"></td>
+                <td><input type="text" value="결제조건:" style="font-weight: bold;"></td>
                 <td><input type="text" value="검수 후 계산서 발행(발행 후 30일이내 현금결제)"></td>
-                <td><input type="text" value="설 치 비 용:" style="font-weight: bold; letter-spacing: 2px;"></td>
+                <td><input type="text" value="설치비용:" style="font-weight: bold;"></td>
                 <td><input type="text" value="당사 파트너사 지원"></td>
             </tr>
             <tr>
-                <td><input type="text" value="견 적 유 효:" style="font-weight: bold; letter-spacing: 2px;"></td>
+                <td><input type="text" value="견적유효:" style="font-weight: bold;"></td>
                 <td><input type="text" value="견적후 3개월"></td>
-                <td><input type="text" value="교 육 비 용:" style="font-weight: bold; letter-spacing: 2px;"></td>
+                <td><input type="text" value="교육비용:" style="font-weight: bold;"></td>
                 <td><input type="text" value="당사 파트너사 지원"></td>
             </tr>
             <tr>
-                <td><input type="text" value="납 기 일 자:" style="font-weight: bold; letter-spacing: 2px;"></td>
+                <td><input type="text" value="납기일자:" style="font-weight: bold;"></td>
                 <td><input type="text" value="별도 협의"></td>
-                <td><input type="text" value="유 지 보 수:" style="font-weight: bold; letter-spacing: 2px;"></td>
+                <td><input type="text" value="유지보수:" style="font-weight: bold;"></td>
                 <td><input type="text" value="유지보수 포함"></td>
             </tr>
             <tr>
                 <td style="vertical-align: top; padding-top: 15px;">
-                    <input type="text" value="비       고:" style="font-weight: bold; letter-spacing: 2px;">
+                    <input type="text" value="비고:" style="font-weight: bold;">
                 </td>
                 <td colspan="3" style="padding-top: 10px;">
                     <textarea placeholder="추가적인 내용을 입력하세요. (출력 시 테두리는 보이지 않습니다.)" oninput="this.style.height = 'auto'; this.style.height = (this.scrollHeight) + 'px'; window.lastAutoRemarks = 'modified';"></textarea>
