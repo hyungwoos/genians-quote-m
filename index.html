@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Genians 공식 자동 견적 시스템 v2.6</title>
+    <title>Genians 공식 자동 견적 시스템 v2.7 DocuRay</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
 
@@ -1058,7 +1058,7 @@
     }
 </script>
 <div class="toolbar">
-    <div style="font-weight: bold; color: var(--genians-green);">Genians Pricing System v2.6</div>
+    <div style="font-weight: bold; color: var(--genians-green);">Genians Pricing System v2.7</div>
     <div>
         <button class="btn btn-add" onclick="addRow()">+ 항목 추가</button>
         <button class="btn btn-print" onclick="prepareAndPrint()">견적서 PDF 저장</button>
@@ -1293,6 +1293,9 @@
             } else if (prodValue.includes("NAC") || prodValue.includes("ZTNA")) {
                 prodLabel = prodValue.includes("NAC") ? "Genian Cloud NAC(서비스형)" : "Genian Cloud ZTNA(서비스형)";
                 unit = "Node";
+            } else if (prodValue.includes("DocuRay")) {
+                prodLabel = `${prodValue}(서비스형)`;
+                unit = "User";
             } else {
                 prodLabel = prodValue || "견적서비스";
             }
@@ -1397,7 +1400,9 @@
             "GIED (Device Control)": "Genian MDR(서비스형) 제안에 대하여 아래와 같이 견적 합니다.",
             "Cloud NAC V6.0": "Genian Cloud NAC(서비스형) 제안에 대하여 아래와 같이 견적 합니다.",
             "Cloud NAC V5.0": "Genian Cloud NAC(서비스형) 제안에 대하여 아래와 같이 견적 합니다.",
-            "Cloud ZTNA (PA)": "Genian Cloud ZTNA(서비스형) 제안에 대하여 아래와 같이 견적 합니다."
+            "Cloud ZTNA (PA)": "Genian Cloud ZTNA(서비스형) 제안에 대하여 아래와 같이 견적 합니다.",
+            "DocuRay DRM": "DocuRay DRM(서비스형) 제안에 대하여 아래와 같이 견적 합니다.",
+            "DocuRay DLP": "DocuRay DLP(서비스형) 제안에 대하여 아래와 같이 견적 합니다."
         };
         
         if (firstRowSel.value === "direct") {
@@ -1411,12 +1416,13 @@
         let hasMDR = false, mdrCycle = "";
         let hasNAC = false, nacCycle = "";
         let hasPA = false, paCycle = "";
+        let hasDocuRay = false;
 
         const rows = document.querySelectorAll('#itemTable tbody tr');
         rows.forEach(tr => {
             const prod = tr.querySelector('.product-sel').value;
             if (!prod || prod === "direct") return; 
-            
+
             const billing = tr.querySelector('.billing-sel').value;
             if (!billing) return; // 납부 주기가 선택되지 않으면 비고란 자동생성 보류
 
@@ -1430,6 +1436,8 @@
                 hasNAC = true; nacCycle = cycleStr;
             } else if (prod.includes("ZTNA") || prod.includes("PA")) {
                 hasPA = true; paCycle = cycleStr;
+            } else if (prod.includes("DocuRay")) {
+                hasDocuRay = true;
             }
         });
 
@@ -1439,24 +1447,48 @@
         const getMethodStr = (cycle) => cycle === "일시납" ? "- 약정 일시납 조건" : `- ${cycle} 구독 서비스 방식`;
 
         if (hasMDR) {
-            parts.push(`[Genian MDR]\n${getMethodStr(mdrCycle)}\n- 관제/대응/분석/조치 모두 포함\n- 별도 추가 과금 없음`);
-        }
-        
-        if (hasNAC && hasPA) {
-            parts.push(`[Cloud ZTNA]\n${getMethodStr(nacCycle)}\n- 네트워크 구성에 따라 장비 및 수량이 변경 될 수 있습니다.\n- 구축/기술지원/유지보수 모두 포함\n- PA 라이선스는 SSL VPN 동시 접속자 기준`);
-        } else if (hasNAC) { 
-            parts.push(`[Cloud NAC]\n${getMethodStr(nacCycle)}\n- 네트워크 구성에 따라 장비 및 수량이 변경 될 수 있습니다.\n- 구축/기술지원/유지보수 모두 포함\n- 별도 추가 과금 없음`);
-        } else if (hasPA) { 
-            parts.push(`[Cloud ZTNA (PA)]\n${getMethodStr(paCycle)}\n- 네트워크 구성에 따라 장비 및 수량이 변경 될 수 있습니다.\n- 구축/기술지원/유지보수 모두 포함\n- 별도 추가 과금 없음`);
+            parts.push(`[Genian MDR]
+${getMethodStr(mdrCycle)}
+- 관제/대응/분석/조치 모두 포함
+- 별도 추가 과금 없음`);
         }
 
-        const autoStr = parts.join('\n\n');
+        if (hasNAC && hasPA) {
+            parts.push(`[Cloud ZTNA]
+${getMethodStr(nacCycle)}
+- 네트워크 구성에 따라 장비 및 수량이 변경 될 수 있습니다.
+- 구축/기술지원/유지보수 모두 포함
+- PA 라이선스는 SSL VPN 동시 접속자 기준`);
+        } else if (hasNAC) { 
+            parts.push(`[Cloud NAC]
+${getMethodStr(nacCycle)}
+- 네트워크 구성에 따라 장비 및 수량이 변경 될 수 있습니다.
+- 구축/기술지원/유지보수 모두 포함
+- 별도 추가 과금 없음`);
+        } else if (hasPA) { 
+            parts.push(`[Cloud ZTNA (PA)]
+${getMethodStr(paCycle)}
+- 네트워크 구성에 따라 장비 및 수량이 변경 될 수 있습니다.
+- 구축/기술지원/유지보수 모두 포함
+- 별도 추가 과금 없음`);
+        }
+
+        if (hasDocuRay) {
+            parts.push(`[DocuRay]
+- 클라우드 서비스형 월 사용 견적 기준
+- 폐쇄망 운영 고객사는 서비스 불가
+- User 추가는 10명 단위로 가능, 제안 단가는 동일하게 적용`);
+        }
+
+        const autoStr = parts.join('
+
+');
         const textarea = document.querySelector('.remarks-section textarea');
-        
+
         if (textarea.value.trim() === "" || textarea.value === window.lastAutoRemarks) {
             textarea.value = autoStr;
             window.lastAutoRemarks = autoStr;
-            
+
             textarea.style.height = "auto";
             if(autoStr !== "") {
                 textarea.style.height = (textarea.scrollHeight + 5) + "px";
@@ -1592,6 +1624,18 @@
                 { max: 2000, prices: { "무약정": 5400, "1년약정": 5400, "2년약정": 5400, "3년약정": 5400 } },
                 { max: 2500, prices: { "무약정": 4800, "1년약정": 4800, "2년약정": 4800, "3년약정": 4800 } },
                 { max: 9999999, prices: { "무약정": 4400, "1년약정": 4400, "2년약정": 4400, "3년약정": 4400 } }
+            ]
+        },
+        "DocuRay DRM": {
+            type: "monthly",
+            tiers: [
+                { max: 9999999, prices: { "무약정": 20000, "1년약정": 20000, "2년약정": 20000, "3년약정": 20000 } }
+            ]
+        },
+        "DocuRay DLP": {
+            type: "monthly",
+            tiers: [
+                { max: 9999999, prices: { "무약정": 20000, "1년약정": 20000, "2년약정": 20000, "3년약정": 20000 } }
             ]
         }
     };
